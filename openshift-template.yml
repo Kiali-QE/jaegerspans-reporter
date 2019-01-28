@@ -43,7 +43,7 @@ objects:
       app: jaegerqe-tools
       group: jaeger-spans-reporter-tool
   spec:
-    replicas: "${{REPLICA_COUNT}}" 
+    replicas: "${REPLICA_COUNT}" 
     strategy:
       type: Recreate
     template:
