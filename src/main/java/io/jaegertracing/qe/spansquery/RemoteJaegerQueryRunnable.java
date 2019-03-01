@@ -31,7 +31,7 @@ public class RemoteJaegerQueryRunnable implements Closeable, Runnable {
 
     private List<ReMetric> metrics = new ArrayList<>();
 
-    String queryUrl = "http://" + config.getJaegerQueryHost() + ":" + config.getJaegerQueryPort();
+    String queryUrl = null;
 
     private static final String URL_SERVICE_LIMIT = "%s/api/traces?service=%s&limit=%d&lookback=1h";
     private static final String URL_SERVICE_LIMIT_TAGS = "%s/api/traces?service=%s&limit=%d&lookback=1h&tags=%s";
@@ -42,6 +42,8 @@ public class RemoteJaegerQueryRunnable implements Closeable, Runnable {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         this.config = config;
+
+        queryUrl = "http://" + config.getJaegerQueryHost() + ":" + config.getJaegerQueryPort();
 
         this.okClient = new OkHttpClient.Builder()
                 .readTimeout(10, TimeUnit.MINUTES)
