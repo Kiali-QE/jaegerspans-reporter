@@ -2,7 +2,7 @@
 parameters:
 - name: JAEGER_SPANS_REPORTER_IMAGE
   description: "Jaeger spans reporter image"
-  value: "jkandasa/jaegerspans-reporter:1.0.0"
+  value: "jkandasa/jaegerspans-reporter:1.0.1"
 - name: REPLICA_COUNT
   description: "Number of replicas to run"
   value: "5"

@@ -27,7 +27,12 @@ public class ReporterConfig implements Serializable {
     private Long startTime;
     private Long endTime;
 
-    private String tracerName;
+    private Integer reporterHostCount;
+    private Integer queryHostCount;
+
+    private String reportEngineUrl;
+    private String reportEngineSuiteId;
+
     private String serviceName;
     private Integer tracersCount;
     private Integer spansCount; // spans per tracer
@@ -37,6 +42,13 @@ public class ReporterConfig implements Serializable {
 
     private String jaegerCollectorHost;
     private Integer jaegerCollectorPort;
+
+    private String jaegerQueryHost;
+    private Integer jaegerQueryPort;
+    private Integer jaegerQueryLimit;
+    private Integer jaegerQuerySamples;
+    private Integer jaegerQueryIteration;
+    private String jaegerQueryOperation;
 
     private String jaegerAgentHost;
     private Integer jaegerAgentPort;
@@ -48,13 +60,17 @@ public class ReporterConfig implements Serializable {
 
     public static ReporterConfig get(Map<String, Object> map) {
         ReporterConfig config = ReporterConfig.builder()
-                .tracerName((String) get(map, "tracerName", "tracer"))
                 .serviceName((String) get(map, "serviceName", "service"))
                 .spansCount((Integer) get(map, "spansCount", 3))
                 .tracersCount((Integer) get(map, "tracersCount", 2))
                 .sender((String) get(map, "sender", "udp"))
                 .jaegerCollectorHost((String) get(map, "jaegerCollectorHost", "localhost"))
                 .jaegerCollectorPort((Integer) get(map, "jaegerCollectorPort", 14268))
+                .jaegerQueryHost((String) get(map, "jaegerQueryHost", "localhost"))
+                .jaegerQueryPort((Integer) get(map, "jaegerQueryPort", 16886))
+                .jaegerQueryLimit((Integer) get(map, "jaegerQueryLimit", 2000))
+                .jaegerQuerySamples((Integer) get(map, "jaegerQuerySamples", 5))
+                .jaegerQueryIteration((Integer) get(map, "jaegerQueryIteration", -1))
                 .jaegerAgentHost((String) get(map, "jaegerAgentHost", "localhost"))
                 .jaegerAgentPort((Integer) get(map, "jaegerAgentPort", 6831))
                 .jaegerSamplingRate(((Double) get(map, "jaegerSamplingRate", 1.0)).floatValue())
@@ -63,9 +79,14 @@ public class ReporterConfig implements Serializable {
                 .jaegerMaxQueueSize((Integer) get(map, "jaegerMaxQueueSize", 10000))
                 .jobId((String) get(map, "jobId", null))
                 .useHostname((Boolean) get(map, "useHostname", false))
+                .reporterHostCount((Integer) get(map, "reporterHostCount", -1))
+                .queryHostCount((Integer) get(map, "queryHostCount", -1))
+                .reportEngineUrl((String) get(map, "reportEngineUrl", "http://localhost:18081"))
+                .reportEngineSuiteId((String) get(map, "reportEngineSuiteId", null))
+                .jaegerQueryOperation((String) get(map, "jaegerQueryOperation", "test"))
                 .build();
         // update startTime and endTime
-        config.setStartTime(getTimestamp(get(map, "startTime", System.currentTimeMillis()), System.currentTimeMillis()));
+        config.setStartTime(getTimestamp(get(map, "startTime", System.currentTimeMillis()), 0L));
         config.setEndTime(getTimestamp(get(map, "endTime", null), config.getStartTime()));
         return config;
     }
@@ -85,28 +106,29 @@ public class ReporterConfig implements Serializable {
             refTimestamp = 0L;
         }
 
-        if (value instanceof Number) {
-            return ((Long) value) + refTimestamp;
+        String strValue = String.valueOf(value);
+        if (strValue.contains("now")) {
+            return System.currentTimeMillis() + refTimestamp;
         } else {
-            String strValue = (String) value;
-            if (strValue.contains("now")) {
-                return System.currentTimeMillis() + refTimestamp;
+            Long number = Long.valueOf(strValue.replaceAll("[^0-9]", ""));
+            Long timestamp = null;
+            if (strValue.endsWith("s")) {
+                timestamp = number * 1000L;
+            } else if (strValue.endsWith("m")) {
+                timestamp = number * 1000L * 60;
+            } else if (strValue.endsWith("h")) {
+                timestamp = number * 1000L * 60 * 60;
+            } else if (strValue.endsWith("d")) {
+                timestamp = number * 1000L * 60 * 60 * 24;
             } else {
-                Long number = Long.valueOf(strValue.replaceAll("[^0-9]", ""));
-                Long timestamp = null;
-                if (strValue.endsWith("s")) {
-                    timestamp = number * 1000L;
-                } else if (strValue.endsWith("m")) {
-                    timestamp = number * 1000L * 60;
-                } else if (strValue.endsWith("h")) {
-                    timestamp = number * 1000L * 60 * 60;
-                } else if (strValue.endsWith("d")) {
-                    timestamp = number * 1000L * 60 * 60 * 24;
-                } else {
-                    timestamp = number;
-                }
-                return timestamp + refTimestamp;
+                timestamp = number;
             }
+
+            timestamp += refTimestamp;
+            if (timestamp < 1546281000000L) { // 2019-JAN-01
+                timestamp += System.currentTimeMillis();
+            }
+            return timestamp;
         }
     }
 

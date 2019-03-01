@@ -4,7 +4,7 @@
 DOCKER_ORG='jkandasa' 
 
 # tag version
-TAG='1.0.0'
+TAG='1.0.1'
 
 # compile java project
 mvn clean package -Dmaven.test.skip=true

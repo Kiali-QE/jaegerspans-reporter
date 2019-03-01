@@ -21,7 +21,10 @@ public class CreateSpansRunnable implements Runnable {
         private long delay = 0;
 
         public SpansReporer() {
-            delay = config.getSpansCount() * 1000L; // delay in microseconds
+            delay = (1000L / config.getSpansCount()); // delay in milliseconds
+            if (delay > 10) {
+                delay -= 1L; // remove 1ms delay from the actual delay
+            }
         }
 
         @Override
@@ -52,7 +55,7 @@ public class CreateSpansRunnable implements Runnable {
                 span.log(logs);
                 span.finish();
                 try {
-                    TimeUnit.MICROSECONDS.sleep(delay);
+                    TimeUnit.MILLISECONDS.sleep(delay);
                 } catch (InterruptedException ex) {
                     logger.error("exception, ", ex);
                 }

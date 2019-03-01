@@ -18,6 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MqttUtils {
     public static final String TOPIC_SPAN_REPORTER = "jaegerqe/spansreporter";
+    public static final String TOPIC_SPAN_QUERY = "jaegerqe/spansquery";
+    public static final String TOPIC_ABOUT_REPORTER = "jaegerqe/aboutreporter";
+    public static final String TOPIC_REQ_CONFIG = "jaegerqe/reqconfig";
+    public static final String TOPIC_REPORTER_CONFIG = "jaegerqe/reporterconfig";
     public static final String TOPIC_TEST = "jaegerqe/test";
 
     private static MqttClient CLIENT;
@@ -56,7 +60,11 @@ public class MqttUtils {
             connOpts.setPassword(conf.getPassword().toCharArray());
             connOpts.setCleanSession(true);
             CLIENT.connect(connOpts);
-            subscribe(TOPIC_SPAN_REPORTER + "/#", TOPIC_TEST + "/#");
+            subscribe(TOPIC_SPAN_REPORTER + "/#",
+                    TOPIC_SPAN_QUERY + "/#",
+                    TOPIC_TEST + "/#",
+                    TOPIC_REPORTER_CONFIG + "/#",
+                    TOPIC_REQ_CONFIG + "/#");
             CLIENT.setCallback(new SimpleCallback());
         } catch (MqttException ex) {
             logger.error("Exception,", ex);

@@ -30,6 +30,15 @@ public class Reporter implements Runnable {
         this.config = config;
     }
 
+    public boolean isValid() {
+        if (config.getReporterHostCount() < 0) {
+            return true;
+        } else if (Utils.getId() <= config.getReporterHostCount()) {
+            return true;
+        }
+        return false;
+    }
+
     private void startReporter() {
 
         logger.debug("{}", config);
@@ -40,8 +49,8 @@ public class Reporter implements Runnable {
 
         try {
             _RUNNING.set(true);
-            logger.info("Loading reportig spans configurations, Sending spans will start @ {}",
-                    new Date(config.getStartTime()));
+            logger.info("Loading reportig spans configurations, Sending spans will start @ {}, end @ {}",
+                    new Date(config.getStartTime()), new Date(config.getEndTime()));
             long startTime = System.currentTimeMillis();
             ExecutorService executor = Executors.newFixedThreadPool(config.getTracersCount());
             List<Future<?>> futures = new ArrayList<>(config.getTracersCount());
@@ -50,9 +59,9 @@ public class Reporter implements Runnable {
             for (int tracerNumber = 1; tracerNumber <= config.getTracersCount(); tracerNumber++) {
                 String name = null;
                 if (config.getUseHostname()) {
-                    name = String.format("%s_%s_%d", config.getTracerName(), hostname, tracerNumber);
+                    name = String.format("%s_%d", hostname, tracerNumber);
                 } else {
-                    name = String.format("%s_%d", config.getTracerName(), tracerNumber);
+                    name = String.valueOf(tracerNumber);
                 }
 
                 String serviceName = String.format("%s-%s", name, config.getServiceName());

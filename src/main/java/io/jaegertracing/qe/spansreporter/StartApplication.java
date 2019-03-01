@@ -17,6 +17,7 @@ public class StartApplication {
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
         MqttUtils.connect();
+        Utils.sendAboutMe();
     }
 
 }
