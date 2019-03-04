@@ -65,10 +65,11 @@ public class ReportEngineClient {
 
     public void addMetricsData(List<ReMetric> metrics) {
         try {
+            logger.debug("Metrics:{}", metrics);
             RequestBody body = RequestBody.create(JSON, objectMapper.writeValueAsString(metrics));
             Request request = new Request.Builder()
                     .url(String.format("%s/metrics/multiple", this.hostUrl))
-                    .put(body)
+                    .post(body)
                     .build();
             execute(request);
         } catch (JsonProcessingException ex) {

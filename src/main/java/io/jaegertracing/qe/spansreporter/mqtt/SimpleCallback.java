@@ -8,7 +8,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.util.SerializationUtils;
 
 import io.jaegertracing.qe.spansquery.RemoteJaegerQueryRunnable;
-
 import io.jaegertracing.qe.spansreporter.Utils;
 import io.jaegertracing.qe.spansreporter.Reporter;
 import io.jaegertracing.qe.spansreporter.ReporterConfig;
@@ -48,7 +47,11 @@ public class SimpleCallback implements MqttCallback {
     }
 
     public void deliveryComplete(IMqttDeliveryToken token) {
-        logger.debug("delivery complete. {}", token.toString());
+        StringBuilder topics = new StringBuilder();
+        for (String topic : token.getTopics()) {
+            topics.append(topic).append(", ");
+        }
+        logger.debug("delivery complete. [topics:{}]", topics);
     }
 
     private void sendSpans(Map<String, Object> data) {

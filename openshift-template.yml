@@ -18,6 +18,9 @@ parameters:
 - name: MQTT_BROKER_PASSWORD
   description: "MQTT broker password"
   value: "guest"
+- name: MY_REFERENCE
+  description: "Reference of this reporter"
+  value: "global"
 
 apiVersion: v1
 kind: Template
@@ -72,3 +75,5 @@ objects:
             value: "${MQTT_BROKER_USER}"
           - name: BROKER_PASSWORD
             value: "${MQTT_BROKER_PASSWORD}"
+          - name: REFERENCE
+            value: "${MY_REFERENCE}"

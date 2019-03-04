@@ -13,7 +13,7 @@ import lombok.Builder;
 @ToString
 @Getter
 public class ReMetric {
-    private String id;
+    private String suiteId;
     private String name;
     @Default
     private Map<String, Object> data = new HashMap<>();
