@@ -104,17 +104,17 @@ public class RemoteJaegerQueryRunnable implements Closeable, Runnable {
                         config.getJaegerQueryLimit(), config.getJaegerQueryOperation()));
 
         updateWithTags(urlsMap, "Nonsense", getNonseseTags());
-        updateWithTags(urlsMap, "Tags", getTags());
+        updateWithTags(urlsMap, "Normal", getTags());
 
         return urlsMap;
     }
 
     private void updateWithTags(Map<String, String> urlsMap, String name, Map<String, String> tags) {
-        String tagsQueryString = getTagsQueryString(urlsMap);
-        urlsMap.put("urlServiceLimitTagsDefaultLimit" + name,
+        String tagsQueryString = getTagsQueryString(tags);
+        urlsMap.put("urlServiceTagsDefaultLimit" + name,
                 String.format(URL_SERVICE_LIMIT_TAGS, queryUrl, config.getServiceName(), DEFAULT_LIMIT,
                         tagsQueryString));
-        urlsMap.put("urlServiceLimitTagsCustomLimit" + name,
+        urlsMap.put("urlServiceTagsCustomLimit" + name,
                 String.format(URL_SERVICE_LIMIT_TAGS, queryUrl, config.getServiceName(), config.getJaegerQueryLimit(),
                         tagsQueryString));
         urlsMap.put("urlServiceOperationTagsDefaultLimit" + name,
@@ -166,12 +166,12 @@ public class RemoteJaegerQueryRunnable implements Closeable, Runnable {
                 response.body().string();
                 long duration = System.currentTimeMillis() - start;
                 ReMetric metric = ReMetric.builder()
-                        .id(config.getReportEngineSuiteId())
+                        .suiteId(config.getReportEngineSuiteId())
                         .name(query.getKey())
                         .build();
                 updateMetric(metric, duration, sample);
                 metrics.add(metric);
-                logger.trace("[{}] {}: {}",
+                logger.debug("[{}] {}: {}",
                         DurationFormatUtils.formatDurationHMS(duration), query.getKey(), query.getValue());
                 response.close();
             } catch (IOException ex) {
