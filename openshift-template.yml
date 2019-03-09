@@ -21,6 +21,30 @@ parameters:
 - name: MY_REFERENCE
   description: "Reference of this reporter"
   value: "global"
+- name: JAEGER_AGENT_IMAGE
+  description: "Jaeger agent image"
+  value: "jaegertracing/jaeger-agent:1.10"
+- name: JA_LOG_LEVEL
+  description: "Jaeger agent log level"
+  value: "info"
+- name: JA_METRIC_BACKEND
+  description: "Jaeger agent metric backend"
+  value: "prometheus"
+- name: JAC_MAX_PACKET_SIZE
+  description: "Jaeger agent compact max packet size"
+  value: "65000"
+- name: JAC_QUEUE_SIZE
+  description: "Jaeger agent compact queue size"
+  value: "1000"
+- name: JAC_WORKERS
+  description: "Jaeger agent compact workers"
+  value: "10"
+- name: JA_REPORTER_TYPE
+  description: "Jaeger agent reporter type"
+  value: "grpc"
+- name: JAEGER_COLLECTOR_HOST_PORT
+  description: "Jaeger collector host port"
+  value: "jaeger-collector:14250"
 
 apiVersion: v1
 kind: Template
@@ -57,6 +81,19 @@ objects:
           test-infra: test-pod
       spec:
         containers:
+        - image: ${JAEGER_AGENT_IMAGE}
+          imagePullPolicy: Always
+          args: ["--log-level=${JA_LOG_LEVEL}",
+                 "--metrics-backend=${JA_METRIC_BACKEND}",
+                 "--processor.jaeger-compact.server-max-packet-size=${JAC_MAX_PACKET_SIZE}",
+                 "--processor.jaeger-compact.server-queue-size=${JAC_QUEUE_SIZE}",
+                 "--processor.jaeger-compact.workers=${JAC_WORKERS}",
+                 "--reporter.type=${JA_REPORTER_TYPE}",
+                 "--reporter.${JA_REPORTER_TYPE}.host-port=${JAEGER_COLLECTOR_HOST_PORT}"]
+          name: jaeger-agent
+          ports:
+          - containerPort: 6831
+            protocol: UDP
         - image: ${JAEGER_SPANS_REPORTER_IMAGE}
           imagePullPolicy: Always
           name: jaeger-spans-reporter-tool

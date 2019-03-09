@@ -48,7 +48,7 @@ public class Utils {
         Map<String, Object> aboutMe = new HashMap<>();
         aboutMe.put("hostname", Utils.getHostname());
         aboutMe.put("timestamp", System.currentTimeMillis());
-        aboutMe.put("reference", System.getenv().get("REFERENCE"));
+        aboutMe.put("reference", System.getenv().getOrDefault("REFERENCE", "global"));
 
         MqttUtils.publish(MqttUtils.TOPIC_ABOUT_REPORTER, aboutMe, 1);
     }
