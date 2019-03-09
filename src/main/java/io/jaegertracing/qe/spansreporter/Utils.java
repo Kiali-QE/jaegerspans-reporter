@@ -31,6 +31,10 @@ public class Utils {
         return hostname;
     }
 
+    public static String getReference() {
+        return System.getenv().getOrDefault("REFERENCE", "global");
+    }
+
     public static void updateMe(Map<String, Object> data) {
         String _hostname = (String) data.get("hostname");
         if (_hostname != null && _hostname.equals(hostname)) {
@@ -48,7 +52,7 @@ public class Utils {
         Map<String, Object> aboutMe = new HashMap<>();
         aboutMe.put("hostname", Utils.getHostname());
         aboutMe.put("timestamp", System.currentTimeMillis());
-        aboutMe.put("reference", System.getenv().getOrDefault("REFERENCE", "global"));
+        aboutMe.put("reference", getReference());
 
         MqttUtils.publish(MqttUtils.TOPIC_ABOUT_REPORTER, aboutMe, 1);
     }

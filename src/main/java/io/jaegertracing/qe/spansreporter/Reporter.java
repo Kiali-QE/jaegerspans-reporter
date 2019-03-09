@@ -31,6 +31,9 @@ public class Reporter implements Runnable {
     }
 
     public boolean isValid() {
+        if (config.getReporterReference() != null && !config.getReporterReference().equals(Utils.getReference())) {
+            return false;
+        }
         if (config.getReporterHostCount() < 0) {
             return true;
         } else if (Utils.getId() <= config.getReporterHostCount()) {

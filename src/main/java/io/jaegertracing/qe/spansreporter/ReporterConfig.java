@@ -23,6 +23,7 @@ public class ReporterConfig implements Serializable {
     private AtomicBoolean stop = new AtomicBoolean(false);
 
     private String jobId;
+    private String reporterReference;
 
     private Long startTime;
     private Long endTime;
@@ -84,6 +85,7 @@ public class ReporterConfig implements Serializable {
                 .reportEngineUrl((String) get(map, "reportEngineUrl", "http://localhost:18081"))
                 .reportEngineSuiteId((String) get(map, "reportEngineSuiteId", null))
                 .jaegerQueryOperation((String) get(map, "jaegerQueryOperation", "test"))
+                .reporterReference((String) get(map, "reporterReference", null))
                 .build();
         // update startTime and endTime
         config.setStartTime(getTimestamp(get(map, "startTime", System.currentTimeMillis()), 0L));

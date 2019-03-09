@@ -51,14 +51,15 @@ public class RemoteJaegerQueryRunnable implements Closeable, Runnable {
     }
 
     public boolean isValid() {
-
+        if (config.getReporterReference() != null && !config.getReporterReference().equals(Utils.getReference())) {
+            return false;
+        }
         if (config.getQueryHostCount() < 0) {
             return true;
         } else if (Utils.getId() <= config.getQueryHostCount()) {
             return true;
         }
         return false;
-
     }
 
     static Map<String, String> getNonseseTags() {
