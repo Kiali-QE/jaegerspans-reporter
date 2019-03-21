@@ -1,0 +1,81 @@
+
+parameters:
+- name: JAEGER_SPANS_REPORTER_IMAGE
+  description: "Jaeger spans reporter image"
+  value: "jkandasa/jaegerspans-reporter:1.0.1"
+- name: REPLICA_COUNT
+  description: "Number of replicas to run"
+  value: "1"
+- name: MQTT_BROKER_HOST
+  description: "MQTT broker hostnme or ip"
+  value: "localhost"
+- name: MQTT_BROKER_PORT
+  description: "MQTT broker port"
+  value: "1883"
+- name: MQTT_BROKER_USER
+  description: "MQTT broker user"
+  value: "guest"
+- name: MQTT_BROKER_PASSWORD
+  description: "MQTT broker password"
+  value: "guest"
+- name: MY_REFERENCE
+  description: "Reference of this reporter"
+  value: "global"
+
+apiVersion: v1
+kind: Template
+labels:
+  app: jaegerqe-spansreporter
+  group: jaeger-spans-reporter-tool
+metadata:
+  name: jaeger-spansreporter-template
+  annotations:
+    description: Jaeger Spans Reporter
+    iconClass: icon-go-gopher
+    openshift.io/display-name: Jaeger Spans Reporter
+    tags: instant-app,jaegerqe-tools,spansreporter
+  labels:
+    app: jaegerqe-tools
+    group: jaeger-spans-reporter-tool
+objects:
+- apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    name: jaeger-spans-reporter-tool
+    labels:
+      app: jaegerqe-tools
+      group: jaeger-spans-reporter-tool
+    annotations:
+      "sidecar.jaegertracing.io/inject": "true"
+  spec:
+    replicas: "${REPLICA_COUNT}" 
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: jaegerqe-tools
+          group: jaeger-spans-reporter-tool
+          test-infra: test-pod
+      spec:
+        containers:
+        - image: ${JAEGER_SPANS_REPORTER_IMAGE}
+          imagePullPolicy: Always
+          name: jaeger-spans-reporter-tool
+          securityContext:
+            privileged: false
+          env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: BROKER_HOST
+            value: "${MQTT_BROKER_HOST}"
+          - name: BROKER_PORT
+            value: "${MQTT_BROKER_PORT}"
+          - name: BROKER_USER
+            value: "${MQTT_BROKER_USER}"
+          - name: BROKER_PASSWORD
+            value: "${MQTT_BROKER_PASSWORD}"
+          - name: REFERENCE
+            value: "${MY_REFERENCE}"
