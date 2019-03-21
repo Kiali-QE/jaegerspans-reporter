@@ -52,20 +52,22 @@ public class MqttUtils {
     public static void connect() {
         MemoryPersistence persistence = new MemoryPersistence();
         MqttConf conf = config();
-        logger.debug("{}", conf);
+        logger.debug("Connecting to the MQTT broker, {}", conf);
         try {
             CLIENT = new MqttClient(conf.getHostUrl(), clientId(), persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setUserName(conf.getUser());
             connOpts.setPassword(conf.getPassword().toCharArray());
             connOpts.setCleanSession(true);
-            CLIENT.connect(connOpts);
+            connOpts.setConnectionTimeout(30000); // 30 seconds
+            CLIENT.setCallback(new SimpleCallback());
+            CLIENT.connectWithResult(connOpts);
+            logger.debug("Connected to the MQTT broker. Connection status:{}", CLIENT.isConnected());
             subscribe(TOPIC_SPAN_REPORTER + "/#",
                     TOPIC_SPAN_QUERY + "/#",
                     TOPIC_TEST + "/#",
                     TOPIC_REPORTER_CONFIG + "/#",
                     TOPIC_REQ_CONFIG + "/#");
-            CLIENT.setCallback(new SimpleCallback());
         } catch (MqttException ex) {
             logger.error("Exception,", ex);
         }

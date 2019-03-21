@@ -3,11 +3,14 @@ package io.jaegertracing.qe.spansreporter.mqtt;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import lombok.ToString;
+
 import lombok.Data;
 
 @Component
 @Data
 @ConfigurationProperties("mqtt.broker")
+@ToString(exclude = { "password" })
 public class MqttConf {
     private String host;
     private Integer port;

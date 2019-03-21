@@ -8,7 +8,7 @@ import io.jaegertracing.qe.spansreporter.Utils;
 @Component
 public class Tasks {
 
-    @Scheduled(fixedRate = 30 * 1000L)
+    @Scheduled(initialDelay = 30 * 1000L, fixedRate = 30 * 1000L)
     public void sendHeartbeat() {
         Utils.sendAboutMe();
     }
