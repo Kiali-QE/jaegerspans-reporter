@@ -57,6 +57,7 @@ objects:
           app: jaegerqe-tools
           group: jaeger-spans-reporter-tool
           test-infra: test-pod
+          jaegerqe-infra: spans-reporter-pod
       spec:
         containers:
         - image: ${JAEGER_SPANS_REPORTER_IMAGE}
@@ -64,6 +65,9 @@ objects:
           name: jaeger-spans-reporter-tool
           securityContext:
             privileged: false
+          ports:
+          - containerPort: 5778
+            protocol: TCP
           env:
           - name: KUBERNETES_NAMESPACE
             valueFrom:
@@ -79,3 +83,20 @@ objects:
             value: "${MQTT_BROKER_PASSWORD}"
           - name: REFERENCE
             value: "${MY_REFERENCE}"
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: jaegerqe-spans-reporter
+    labels:
+      app: jaegerqe-spansreporter
+      group: jaeger-spans-reporter-tool
+  spec:
+    ports:
+    - name: jaeger-agent-metrics
+      port: 5778
+      protocol: TCP
+      targetPort: 5778
+    selector:
+      jaegerqe-infra: spans-reporter-pod
+    type: ClusterIP
