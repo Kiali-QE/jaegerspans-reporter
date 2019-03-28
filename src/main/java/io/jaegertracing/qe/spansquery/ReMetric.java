@@ -14,7 +14,9 @@ import lombok.Builder;
 @Getter
 public class ReMetric {
     private String suiteId;
-    private String name;
+    private String measurementSuffix;
     @Default
     private Map<String, Object> data = new HashMap<>();
+    @Default
+    private Map<String, String> labels = new HashMap<>();
 }

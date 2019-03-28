@@ -24,6 +24,8 @@ import okhttp3.Response;
 @Slf4j
 public class RemoteJaegerQueryRunnable implements Closeable, Runnable {
 
+    private static final String INFLUXDB_MEASUREMENT_SUFFIX = "api_query";
+
     private static final int DEFAULT_LIMIT = 20;
     private OkHttpClient okClient;
     private ObjectMapper objectMapper;
@@ -168,8 +170,9 @@ public class RemoteJaegerQueryRunnable implements Closeable, Runnable {
                 long duration = System.currentTimeMillis() - start;
                 ReMetric metric = ReMetric.builder()
                         .suiteId(config.getReportEngineSuiteId())
-                        .name(query.getKey())
+                        .measurementSuffix(INFLUXDB_MEASUREMENT_SUFFIX)
                         .build();
+                metric.getLabels().put("name", query.getKey());
                 updateMetric(metric, duration, sample);
                 metrics.add(metric);
                 logger.debug("[{}] {}: {}",
