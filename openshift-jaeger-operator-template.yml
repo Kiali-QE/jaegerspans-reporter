@@ -87,11 +87,12 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: jaegerqe-spans-reporter
+    name: jaegerqe-spans-reporter-headless
     labels:
       app: jaegerqe-spansreporter
       group: jaeger-spans-reporter-tool
   spec:
+    clusterIP: None
     ports:
     - name: jaeger-agent-metrics
       port: 5778
